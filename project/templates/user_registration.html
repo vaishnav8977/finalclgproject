@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - TalkBridge</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Variables for easy color management */
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #6A798F;
+            --accent-color: #F8B400;
+            --bg-light: #F4F6F9;
+            --bg-dark: #2C3E50;
+            --text-dark: #333;
+            --text-light: #fff;
+            --card-bg: #fff;
+            --border-color: #E0E0E0;
+            --input-border: #DCDCDC;
+            --focus-glow: rgba(74, 144, 226, 0.4);
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-dark: 0 10px 40px rgba(0, 0, 0, 0.2);
+            --transition-speed: 0.3s ease;
+        }
+        
+        /* General Body & Typography */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--bg-light) 100%);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-top: 0;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color var(--transition-speed);
+        }
+        
+        a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        /* Container & Card Layout */
+        .register-container {
+            width: 100%;
+            /* Reduced from 900px to 750px for a smaller size */
+            max-width: 750px; 
+            display: flex;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            animation: fadeIn 1s forwards;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Left Side: Branding & Image */
+        .register-branding {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to top right, var(--primary-color), #2A66AC);
+            color: var(--text-light);
+            /* Reduced padding from 40px to 30px */
+            padding: 30px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-branding::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.05);
+            transform: rotate(45deg);
+            z-index: 0;
+            animation: pulseBg 20s infinite;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            z-index: 1;
+            transition: transform var(--transition-speed);
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo i {
+            margin-right: 10px;
+            transition: transform var(--transition-speed);
+        }
+        
+        .logo:hover i {
+            transform: rotate(10deg);
+        }
+
+        .branding-text h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--text-light);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .branding-text p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 1;
+        }
+
+        /* Right Side: Registration Form */
+        .register-form-wrapper {
+            flex: 1;
+            /* Reduced padding from 50px to 40px */
+            padding: 40px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-header {
+            text-align: center;
+            /* Reduced margin from 40px to 30px */
+            margin-bottom: 30px; 
+        }
+
+        .form-header h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            position: relative;
+            /* Reduced margin from 25px to 20px */
+            margin-bottom: 20px; 
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            transition: color var(--transition-speed);
+        }
+
+        .form-control {
+            width: 100%;
+            /* Reduced padding from 15px to 12px */
+            padding: 12px 12px 12px 40px; 
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            transition: all var(--transition-speed);
+            box-sizing: border-box;
+        }
+
+        .form-control::placeholder {
+            color: var(--secondary-color);
+            opacity: 0.8;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px var(--focus-glow);
+            background-color: var(--card-bg);
+        }
+
+        .form-group.has-error .form-control {
+            border-color: #E24A4A;
+        }
+        
+        .form-group.has-error i {
+            color: #E24A4A;
+        }
+
+        /* Checkbox & Forgot Password */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* Reduced margin from 30px to 20px */
+            margin-bottom: 20px; 
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .remember-me input {
+            margin-right: 8px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            /* Reduced padding from 16px to 14px */
+            padding: 14px; 
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed), transform var(--transition-speed), box-shadow var(--transition-speed);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-submit:hover {
+            background-color: #3A73B6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Social Login */
+        .social-login {
+            text-align: center;
+            /* Reduced margin from 25px to 20px */
+            margin-top: 20px; 
+        }
+
+        .social-login p {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-icons a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--bg-light);
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed);
+        }
+
+        .social-icons a:hover {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            transform: translateY(-3px) scale(1.1);
+        }
+
+        .social-icons a i {
+            font-size: 1.2rem;
+        }
+
+        /* Footer Text */
+        .login-link {
+            text-align: center;
+            /* Reduced margin from 30px to 25px */
+            margin-top: 25px; 
+            font-size: 1rem;
+            color: var(--secondary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .register-container {
+                flex-direction: column;
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            .register-branding {
+                padding: 30px;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+
+            .register-form-wrapper {
+                padding: 30px 20px;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulseBg {
+            0% { transform: scale(1); opacity: 0.05; }
+            50% { transform: scale(1.1); opacity: 0.1; }
+            100% { transform: scale(1); opacity: 0.05; }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        
+        <div class="register-branding">
+            <div class="logo">
+                <i class="fas fa-bridge"></i>
+                <span>TalkBridge</span>
+            </div>
+            <div class="branding-text">
+                <h2>Unlock the World of Communication</h2>
+                <p>Register now to join a network of thousands breaking down language barriers with seamless, real-time translation technology.</p>
+            </div>
+            </div>
+
+        <div class="register-form-wrapper">
+            <div class="form-header">
+
+                {% if messages %}
+                {% for messeage in messages %}
+                <p class="text-center">{{message}}</p>
+                {% endfor %}
+                {% endif %}
+
+                <h2>Create Your Account</h2>
+                <p>Sign up to get started in seconds.</p>
+            </div>
+            
+            <form action="{% url 'user_registration' %}" method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" name="firstname" class="form-control" placeholder="First Name" required>
+                </div>
+
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" name="lastname" class="form-control" placeholder="Last Name" required>
+                </div>
+
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Full Name" required>
+                </div>
+                
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Email Address" required>
+                </div>
+                
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                </div>
+                
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="confirm-password" name="confirm-password" class="form-control" placeholder="Confirm Password" required>
+                </div>
+                
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit">Register Now</button>
+            </form>
+            
+            <div class="social-login">
+                <p>or register with</p>
+                <div class="social-icons">
+                    <a href="#" aria-label="Register with Google"><i class="fab fa-google"></i></a>
+                    <a href="#" aria-label="Register with Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Register with Apple"><i class="fab fa-apple"></i></a>
+                </div>
+            </div>
+            
+            <p class="login-link">Already have an account? <a href="{% url 'user_login' %}">Log in here</a></p>
+            
+        </div>
+    </div>
+</body>
+</html>

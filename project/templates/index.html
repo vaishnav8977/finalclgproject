@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalkBridge - Real-time Speech Translation Network</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <style>
+        /* Add some basic styles for the images */
+        .hero-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px auto;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            object-fit: cover;
+            height: 450px; /* Adjusted height for better visual impact */
+        }
+
+        .section-image {
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            object-fit: cover;
+            height: 350px; /* Adjusted height */
+        }
+
+        .cta-image {
+            width: 100%;
+            max-width: 700px;
+            margin: 40px auto 20px;
+            display: block;
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            object-fit: cover;
+            height: 400px; /* Adjusted height */
+        }
+
+        /* Responsive adjustments for images */
+        @media (max-width: 768px) {
+            .hero-image, .section-image, .cta-image {
+                height: auto;
+                max-height: 300px;
+            }
+        }
+        .chatbot-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1000;
+}
+
+.chatbot-icon:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Translator Card Styles */
+.translator-card {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 350px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transform: translateY(100px) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+    z-index: 999;
+}
+
+.translator-card.open {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.translator-header {
+    background: #007bff;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.translator-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.close-btn {
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 300;
+    transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+    color: #f1f1f1;
+}
+
+.translator-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+#input-text, .translated-text {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    margin-bottom: 15px;
+}
+
+.translated-text {
+    min-height: 80px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.language-selector {
+    margin-bottom: 15px;
+}
+
+#target-language {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+#translate-btn {
+    padding: 12px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+#translate-btn:hover {
+    background-color: #218838;
+}
+
+@media (max-width: 480px) {
+    .translator-card {
+        width: 90%;
+        right: 5%;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            {% block nav %}
+            <nav>
+                <a href="{% url 'index' %}" class="logo">
+                    <i class="fas fa-bridge"></i>
+                    <span>TalkBridge</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'user_registration' %}">Register</a></li>
+                    <li><a href="{% url 'user_login' %}">Login</a></li>
+                </ul>
+                <div class="hamburger">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+            {% endblock %}
+        </div>
+    </header>
+
+    
+    <section class="hero">
+        <div class="container">
+            {% block main %}
+            <div class="hero-content">
+                <h1>Break Language Barriers in Real-Time</h1>
+                <p>TalkBridge connects people across languages with seamless, accurate speech translation powered by advanced AI technology.</p>
+                <a href="#" class="btn">Get Started Free</a>
+            </div>
+            <img class="hero-image" src="/static/images/Waves.jpg" alt="Diverse group of people in a video call, each speaking a different language, with speech bubbles and translation icons connecting them seamlessly. The background is a futuristic, interconnected network of light lines.">
+            {% endblock %}
+        </div>
+    </section>
+
+    {% block features %}
+
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Powerful Features</h2>
+                <p>Experience the future of communication with TalkBridge's innovative capabilities</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3>Real-Time Translation</h3>
+                    <p>Translate speech instantly between 40+ languages with minimal latency for natural conversations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Multi-User Conference</h3>
+                    <p>Connect multiple participants in a conversation, each speaking their native language seamlessly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered Accuracy</h3>
+                    <p>Our advanced neural networks understand context and nuance for more accurate translations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endblock %}
+
+    {% block working %}
+    <section class="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <h2>How TalkBridge Works</h2>
+                <p>Transforming cross-language communication in three simple steps</p>
+            </div>
+            <img class="section-image" src="/static/images/t2.jpg" src="/static/images/Gemini_Generated_Image_mjoy0tmjoy0tmjoy.png" alt="Infographic showing a person speaking into a microphone, an arrow pointing to a cloud with 'AI Translation' text, and another arrow pointing to a diverse group of people listening with translated speech bubbles.">
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Speak</h3>
+                    <p>Talk naturally in your preferred language. Our system captures your speech with crystal clarity.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Translate</h3>
+                    <p>Our AI engine processes and translates your speech in real-time, preserving tone and context.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Communicate</h3>
+                    <p>The translated speech is delivered to your conversation partners in their preferred language.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endblock %}
+
+
+    {% block cta %}
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Break Language Barriers?</h2>
+            <p>Join thousands of users who are already experiencing seamless cross-language communication with TalkBridge.</p>
+            <a href="#" class="btn">Start Your Free Trial</a>
+            <img class="cta-image" src="/static/images/Gemini_Generated_Image_mjoy0tmjoy0tmjoy.png" alt="Smiling diverse professionals collaborating in a modern office, with a subtle overlay of digital translation interfaces suggesting ease of communication.">
+
+        </div>
+    </section>
+    {% endblock %}
+
+    <div class="chatbot-icon" id="chatbot-icon">
+    <i class="fas fa-comments"></i>
+</div>
+
+<div class="translator-card" id="translator-card">
+    <div class="translator-header">
+        <h3>Translator</h3>
+        <span class="close-btn" id="close-btn">&times;</span>
+    </div>
+    <div class="translator-body">
+        <textarea id="input-text" placeholder="Enter text to translate..." rows="4"></textarea>
+        <div class="language-selector">
+            <select id="target-language">
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="ja">Japanese</option>
+                <option value="zh">Chinese</option>
+            </select>
+        </div>
+        <button id="translate-btn">Translate</button>
+        <div id="output-text" class="translated-text"></div>
+    </div>
+</div>
+
+    {% block footer %}
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>TalkBridge</h3>
+                    <p>Breaking down language barriers with cutting-edge real-time speech translation technology.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="{% url 'user_registration' %}">Register</a></li>
+                        <li><a href="{% url 'user_login' %}">Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Support Center</a></li>
+                        <li><a href="#">API Developers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Innovation Blvd, Tech City</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@talkbridge.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 TalkBridge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <script>
+        // Simple animation for elements when they come into view
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            document.querySelectorAll('.feature-card, .step').forEach(item => {
+                observer.observe(item);
+            });
+            
+            // Mobile menu toggle
+            const hamburger = document.querySelector('.hamburger');
+            const navLinks = document.querySelector('.nav-links');
+            
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // ... existing observer and hamburger logic
+
+    const chatbotIcon = document.getElementById('chatbot-icon');
+    const translatorCard = document.getElementById('translator-card');
+    const closeBtn = document.getElementById('close-btn');
+    const translateBtn = document.getElementById('translate-btn');
+    const inputText = document.getElementById('input-text');
+    const outputText = document.getElementById('output-text');
+    const targetLanguage = document.getElementById('target-language');
+
+    // Toggle translator card visibility
+    chatbotIcon.addEventListener('click', () => {
+        translatorCard.classList.toggle('open');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        translatorCard.classList.remove('open');
+    });
+
+    // Handle translation with LibreTranslate
+    translateBtn.addEventListener('click', async () => {
+        const textToTranslate = inputText.value;
+        const targetLang = targetLanguage.value;
+
+        if (textToTranslate.trim() === '') {
+            outputText.textContent = 'Please enter some text to translate.';
+            return;
+        }
+        const apiKey = 'YOUR_LIBRETRANSLATE_API_KEY';
+
+        const url = `https://libretranslate.com/translate?api_key=${apiKey}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    q: textToTranslate,
+                    source: 'auto',
+                    target: targetLang
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`HTTP error! Status: ${response.status}. Message: ${errorData.error || 'Unknown error'}`);
+            }
+
+            const data = await response.json();
+            const translatedText = data.translatedText;
+            outputText.textContent = translatedText;
+        } catch (error) {
+            console.error('Translation failed:', error);
+            outputText.textContent = `Translation failed. ${error.message}`;
+        }
+    });
+});
+    </script>
+</body>
+</html>

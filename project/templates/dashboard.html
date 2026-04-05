@@ -1,0 +1,20 @@
+{% extends 'index.html' %}
+
+{% block nav %}
+<nav>
+    <a href="{% url 'dashboard' %}" class="logo">
+        <i class="fas fa-bridge"></i>
+        <span>TalkBridge</span>
+    </a>
+    <ul class="nav-links">
+        <li><a href="{% url 'dashboard' %}">Home</a></li>
+        <li><a href="{% url 'mic' %}">Voice to Voice</a></li>
+        <!-- <li><a href="#">Voice to Text</a></li> -->
+        <li><a href="{% url 'upload' %}">Text to Voice</a></li>
+        <li><a href="{% url 'logout_user' %}">Logout</a></li>
+    </ul>
+    <div class="hamburger">
+        <i class="fas fa-bars"></i>
+    </div>
+</nav>
+{% endblock %}

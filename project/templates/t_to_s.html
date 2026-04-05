@@ -1,0 +1,441 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+{% block main %}
+<style>
+    /* Main Container Styling */
+    .tts-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 40px 20px;
+        background: #f0f4f8; /* A very light, clean background */
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    /* Card - The central element */
+    .tts-card {
+        background: rgba(255, 255, 255, 0.2); /* Frosted Glass effect */
+        backdrop-filter: blur(20px) saturate(150%);
+        -webkit-backdrop-filter: blur(20px) saturate(150%);
+        border-radius: 30px;
+        padding: 50px;
+        width: 100%;
+        max-width: 800px;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .tts-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 50px 100px rgba(0, 0, 0, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+    }
+    
+    /* Heading Styling */
+    .tts-heading {
+        text-align: center;
+        font-weight: 800;
+        font-size: 3rem;
+        margin-bottom: 15px;
+        background: linear-gradient(90deg, #8c7e9b 0%, #3b424d 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .tts-subheading {
+        text-align: center;
+        color: #7f8c8d;
+        font-size: 1.2rem;
+        margin-bottom: 40px;
+        font-weight: 500;
+    }
+    
+    /* Form Elements Styling */
+    .contact-form {
+        width: 100%;
+    }
+    
+    .form-control {
+        border-radius: 15px;
+        padding: 18px 25px;
+        border: none;
+        font-size: 18px;
+        transition: all 0.3s ease-in-out;
+        background-color: #f8f9fa;
+        box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.08);
+        margin-bottom: 25px;
+        width: 100%;
+    }
+    
+    .form-control:focus {
+        background-color: #fff;
+        box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1), 0 0 0 4px rgba(106, 17, 203, 0.2);
+        outline: none;
+    }
+    
+    /* Button Styling */
+    .btn {
+        border-radius: 50px;
+        padding: 15px 40px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+    
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: all 0.5s ease;
+        z-index: 1;
+    }
+    
+    .btn:hover::before {
+        left: 100%;
+    }
+    
+    .btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn:active {
+        transform: translateY(-2px);
+    }
+    
+    .btn-info {
+        background: linear-gradient(45deg, #1e90ff, #00bfff);
+    }
+    
+    .btn-submit {
+        background: linear-gradient(45deg, #918c96, #4f4e50);
+        width: 100%;
+        padding: 20px;
+        font-size: 1.2rem;
+        margin-top: 30px;
+    }
+    
+    /* Translated Text Display */
+    .translated-section {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 30px 0;
+        color: #333;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .translated-section h4 {
+        margin-bottom: 20px;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    
+    #translatedText {
+        font-size: 1.3rem;
+        line-height: 1.8;
+        background: rgba(255, 255, 255, 0.3);
+        padding: 20px;
+        border-radius: 15px;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+    }
+    
+    /* Audio Player Styling */
+    .audio-section {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 30px 0;
+        color: white;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .audio-section h2 {
+        margin-bottom: 25px;
+        font-weight: 700;
+        font-size: 1.8rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    
+    #audio {
+        width: 100%;
+        border-radius: 15px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .audio-controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-success {
+        background: linear-gradient(45deg, #2ecc71, #27ae60);
+    }
+    
+    .btn-warning {
+        background: linear-gradient(45deg, #f1c40f, #f39c12);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+    }
+    
+    /* Language Select Styling */
+    .language-selector {
+        position: relative;
+        margin-bottom: 25px;
+    }
+    
+    .language-selector label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #495057;
+        font-size: 1.1rem;
+    }
+    
+    /* Animation for text translation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .tts-card {
+            padding: 30px 20px;
+        }
+        
+        .tts-heading {
+            font-size: 2.2rem;
+        }
+        
+        .tts-subheading {
+            font-size: 1rem;
+        }
+        
+        .audio-controls {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn {
+            width: 100%;
+            max-width: 250px;
+        }
+        
+        .form-control {
+            padding: 15px 20px;
+            font-size: 16px;
+        }
+    }
+    
+    /* Loading Spinner */
+    .spinner {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 4px solid rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s linear infinite;
+        margin-right: 15px;
+        vertical-align: middle;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* A little extra visual flair for the container background */
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
+      }
+      70% {
+        box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+      }
+    }
+    
+    .btn-info, .btn-submit, .btn-success, .btn-warning, .btn-primary {
+        animation: pulse 2s infinite;
+    }
+</style>
+
+<div class="tts-container">
+    <div class="tts-card">
+        <center>
+            <form id="ttsForm" action="{% url 'upload' %}" method="post" class="contact-form">
+                {% csrf_token %}
+                <h1 class="tts-heading">Text to Speech with Translation</h1>
+                <p class="tts-subheading">Convert your text to speech in multiple languages</p>
+
+                <!-- Text Input -->
+                <input type="text" id="textInput" name="text" class="form-control" placeholder="Enter text in English..." required>
+
+                <!-- Language Selection -->
+                <div class="language-selector">
+                    <label for="languageSelect">Select Target Language:</label>
+                    <select id="languageSelect" name="language" class="form-control">
+                        <option value="hi">Hindi</option>
+                        <option value="ta">Tamil</option>
+                        <option value="te">Telugu</option>
+                        <option value="bn">Bengali</option>
+                        <option value="mr">Marathi</option>
+                        <option value="kn">Kannada</option>
+                    </select>
+                </div>
+
+                <!-- Translate Button -->
+                <button type="button" class="btn btn-info" onclick="translateText()">
+                    <span class="spinner" id="translateSpinner" style="display: none;"></span>
+                    Translate Text
+                </button>
+
+                <!-- Display Translated Text -->
+                <div class="translated-section" id="translatedSection" style="display: none;">
+                    <h4>Translated Text:</h4>
+                    <p id="translatedText"></p>
+                </div>
+
+                <!-- Hidden Input for Translated Text -->
+                <input type="hidden" id="translatedTextInput" name="translated_text">
+
+                <button type="submit" class="btn btn-submit">Generate Speech</button>
+            </form>
+
+            {% if speech_path %}
+                <div class="audio-section">
+                    <h2>Generated Speech:</h2>
+                    <audio id="audio" controls>
+                        <source src="{{ speech_path }}" type="audio/mp3">
+                        Your browser does not support the audio element.
+                    </audio>
+                    
+                    <div class="audio-controls">
+                        <button onclick="playAudio()" class="btn btn-success">Play</button>
+                        <button onclick="pauseAudio()" class="btn btn-warning">Pause</button>
+                        <button onclick="resumeAudio()" class="btn btn-primary">Resume</button>
+                    </div>
+                </div>
+            {% endif %}
+        </center>
+    </div>
+</div>
+
+<script>
+    function translateText() {
+        let text = document.getElementById("textInput").value;
+        let lang = document.getElementById("languageSelect").value;
+        let translatedSection = document.getElementById("translatedSection");
+        let translateSpinner = document.getElementById("translateSpinner");
+
+        if (!text) {
+            alert("Please enter text to translate!");
+            return;
+        }
+
+        // Show loading spinner
+        translateSpinner.style.display = "inline-block";
+        
+        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`)
+        .then(response => response.json())
+        .then(data => {
+            let translatedText = data[0][0][0];
+            let translatedTextElement = document.getElementById("translatedText");
+            
+            // Hide spinner and show translated text with animation
+            translateSpinner.style.display = "none";
+            translatedTextElement.innerText = translatedText;
+            document.getElementById("translatedTextInput").value = translatedText;
+            
+            // Show and animate the translated section
+            translatedSection.style.display = "block";
+            translatedSection.classList.add("fade-in");
+        })
+        .catch(err => {
+            console.error("Translation error:", err);
+            translateSpinner.style.display = "none";
+            alert("Translation failed. Please try again.");
+        });
+    }
+
+    var audio = document.getElementById("audio");
+
+    function playAudio() {
+        if (audio) {
+            audio.play();
+        }
+    }
+
+    function pauseAudio() {
+        if (audio) {
+            audio.pause();
+        }
+    }
+
+    function resumeAudio() {
+        if (audio && audio.paused) {
+            audio.play();
+        }
+    }
+    
+    // Add some interactivity to form inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        const textInput = document.getElementById('textInput');
+        const languageSelect = document.getElementById('languageSelect');
+        
+        if (textInput) {
+            textInput.addEventListener('focus', function() {
+                this.style.transform = 'scale(1.02)';
+            });
+            
+            textInput.addEventListener('blur', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
+        
+        if (languageSelect) {
+            languageSelect.addEventListener('focus', function() {
+                this.style.transform = 'scale(1.02)';
+            });
+            
+            languageSelect.addEventListener('blur', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block features %} {% endblock %}
+{% block working %} {% endblock %}
+{% block cta %} {% endblock %}

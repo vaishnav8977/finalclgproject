@@ -1,0 +1,356 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+{% block main %}
+<style>
+    .info_section {
+        padding: 50px 0;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+    }
+    .container-fluid {
+        width: 95%;
+        margin: 0 auto;
+    }
+
+    /* Headings and Text */
+    h2, h3, h4 {
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #1a1a1a;
+    }
+
+    .contact_section {
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .contact_section h2 {
+        color: #007bff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Buttons */
+    .btn {
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 50px;
+        padding: 10px 25px;
+        margin: 5px;
+        min-width: 120px;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+    /* Form Elements (Select) */
+    .form-control {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 1px solid #ced4da;
+        font-size: 16px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    /* Recording & Transcript Sections */
+    #recordingsList {
+        list-style: none;
+        padding: 0;
+        margin-top: 20px;
+    }
+    
+    #recordingsList li {
+        margin-bottom: 10px;
+        background: #f1f3f5;
+        padding: 10px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    #recordingsList audio {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    #transcriptContainer {
+        border-top: 2px solid #e9ecef;
+        padding-top: 30px;
+        margin-top: 30px !important;
+    }
+
+    #transcribedText, #translatedText {
+        padding: 15px;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-left: 5px solid #007bff;
+        border-radius: 8px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+    
+    #detectedLanguage {
+        font-size: 16px;
+        font-weight: bold;
+        color: #28a745;
+        margin-top: 10px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .btn {
+            padding: 8px 15px;
+            font-size: 14px;
+            min-width: 100px;
+        }
+
+        .contact_section {
+            padding: 20px;
+        }
+    }
+</style>
+<div class="info_section">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-11 text-center">
+                <section class="contact_section">
+                    <h2 style="color: white; margin-top: 50px;">Speech to Text & Translation</h2>
+
+                    <h3>Step 1 - Record your voice</h3>
+                    <div id="controls" class="mt-3">
+                        <button id="recordButton" class="btn btn-primary mx-2">Record</button>
+                        <button id="stopButton" class="btn btn-danger mx-2" disabled>Stop</button>
+                        <button id="transcribeButton" class="btn btn-success mx-2" disabled>Transcribe</button>
+                    </div>
+                    <p id="formats" class="mt-2">Format: </p>
+                    <h3>Recorded Audio</h3>
+                    <ol id="recordingsList" class="mt-3"></ol>
+
+                    <form id="csrfForm">
+                        {% csrf_token %}
+                    </form>
+
+                    <div id="transcriptContainer" class="mt-4" style="display: none;">
+                        <h4>Recognized Text:</h4>
+                        <p id="transcribedText" style="font-size: 18px; font-weight: bold;"></p>
+                        <p id="detectedLanguage" style="font-size: 16px; font-weight: bold; color: green;"></p>
+
+                        <h4 class="mt-3">Step 2 - Translate</h4>
+                        <select id="languageSelect" class="form-control mt-2">
+                            <option value="hi">Hindi</option>
+                            <option value="te">Telugu</option>
+                            <option value="ta">Tamil</option>
+                            <option value="kn">Kannada</option>
+                            <option value="gu">Gujurathi</option>
+                            <option value="ru">Russian</option>
+                            <option value="ar">Arabic</option>
+                            <option value="pt">Portuguese</option>
+                        </select>
+                        <button onclick="translateText()" class="btn btn-info mt-2">Translate</button>
+
+                        <h4 class="mt-3">Translated Text:</h4>
+                        <p id="translatedText" style="font-size: 18px; font-weight: bold;"></p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/WebAudioRecorder.min.js' %}"></script>
+<script>
+    let recordButton = document.getElementById("recordButton");
+    let stopButton = document.getElementById("stopButton");
+    let transcribeButton = document.getElementById("transcribeButton");
+    let recordingsList = document.getElementById("recordingsList");
+    let formats = document.getElementById("formats");
+    let transcriptContainer = document.getElementById("transcriptContainer");
+    let transcribedTextElement = document.getElementById("transcribedText");
+    let detectedLanguageElement = document.getElementById("detectedLanguage"); // New element reference
+
+    let audioContext;
+    let gumStream;
+    let recorder;
+    let input;
+    let audioBlob;
+    let transcribedText = "";
+
+    recordButton.addEventListener("click", startRecording);
+    stopButton.addEventListener("click", stopRecording);
+    transcribeButton.addEventListener("click", transcribeAudio);
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    function startRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+            audioContext = new AudioContext();
+            gumStream = stream;
+            input = audioContext.createMediaStreamSource(stream);
+
+            recorder = new WebAudioRecorder(input, {
+                workerDir: "{% static 'js/' %}",
+                encoding: "wav",
+                numChannels: 1,
+            });
+
+            recorder.onComplete = function (_, blob) {
+                audioBlob = blob;
+                let url = URL.createObjectURL(blob);
+                let li = document.createElement("li");
+                let audio = document.createElement("audio");
+                audio.controls = true;
+                audio.src = url;
+                li.appendChild(audio);
+                recordingsList.appendChild(li);
+                transcribeButton.disabled = false;
+            };
+
+            recorder.startRecording();
+            recordButton.disabled = true;
+            stopButton.disabled = false;
+            formats.innerHTML = "Recording in wav format...";
+        });
+    }
+
+    function stopRecording() {
+        recorder.finishRecording();
+        gumStream.getAudioTracks()[0].stop();
+        recordButton.disabled = false;
+        stopButton.disabled = true;
+        formats.innerHTML = "Recording stopped.";
+    }
+
+    function transcribeAudio() {
+        if (!audioBlob) {
+            alert("No recording found. Please record your voice first.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", audioBlob, "recording.wav");
+
+        fetch("{% url 'mic' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": getCSRFToken()
+            }
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.transcript) {
+                transcribedText = data.transcript;
+                transcribedTextElement.innerText = transcribedText;
+                detectedLanguageElement.innerText = `Detected Language: ${data.detected_language}`;
+                transcriptContainer.style.display = "block"; // Show transcript and translation options
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch((err) => {
+            console.error("Error during transcription:", err);
+        });
+    }
+
+    function speakTranslatedText(text, lang) {
+    if ('speechSynthesis' in window) {
+        // Consolidated the voice selection and speaking logic into one function to avoid duplication
+        const speak = () => {
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+
+            // --- Voice quality adjustments ---
+            // Set a slightly slower speech rate (0.1 to 10.0, default is 1.0)
+            utterance.rate = 0.9; 
+            // Set a slightly lower pitch (0.0 to 2.0, default is 1.0)
+            utterance.pitch = 0.95;
+
+            // Find a suitable voice for the language
+            let voices = window.speechSynthesis.getVoices();
+            let selectedVoice = voices.find(voice => voice.lang.startsWith(lang));
+            
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            } else {
+                console.warn(`No voice found for language: ${lang}. Using default voice.`);
+            }
+            
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // If voices are already loaded, just speak
+        if (window.speechSynthesis.getVoices().length > 0) {
+            speak();
+        } else {
+            // Wait for voices to be loaded
+            window.speechSynthesis.onvoiceschanged = speak;
+        }
+    } else {
+        console.warn("Text-to-speech not supported in this browser.");
+    }
+}
+
+    function translateText() {
+        if (!transcribedText) {
+            alert("No text available for translation!");
+            return;
+        }
+
+        let lang = document.getElementById("languageSelect").value;
+        let translatedTextElement = document.getElementById("translatedText");
+
+        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(transcribedText)}`)
+        .then(response => response.json())
+        .then(data => {
+            const translatedText = data[0][0][0];
+            translatedTextElement.innerText = translatedText;
+
+            // Call the new function to handle speech synthesis
+            speakTranslatedText(translatedText, lang);
+        })
+        .catch(err => console.error("Translation error:", err));
+    }
+</script>
+{% endblock %}
+
+{% block features %} {% endblock %}
+{% block working %} {% endblock %}
+{% block cta %} {% endblock %}

@@ -1,0 +1,294 @@
+{% extends 'index.html' %}
+
+{% block main %}
+<style>
+    .otp-verification-container {
+        max-width: 500px;
+        margin: 4rem auto;
+        padding: 2.5rem;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e0e0e0;
+    }
+
+    .otp-verification-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .otp-verification-title {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+    }
+
+    .otp-verification-subtitle {
+        color: #7f8c8d;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .email-display {
+        font-size: 0.95rem;
+        color: #3498db;
+        background: #f8f9fa;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+
+    .otp-verification-form .form-group {
+        margin-bottom: 1.75rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .otp-input-container {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .otp-input {
+        width: 52px;
+        height: 64px;
+        text-align: center;
+        font-size: 1.6rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        background: #f9fafb;
+    }
+
+    .otp-input:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        background: #ffffff;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.875rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+        width: 100%;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        transform: translateY(-1px);
+    }
+
+    .timer {
+        text-align: center;
+        margin: 1.5rem 0;
+        font-size: 0.95rem;
+        color: #e74c3c;
+        font-weight: 500;
+    }
+
+    .resend-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .resend-link a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .resend-link a:hover {
+        text-decoration: underline;
+    }
+
+    .resend-link.disabled {
+        color: #95a5a6;
+        cursor: not-allowed;
+    }
+
+    .resend-link.disabled a {
+        pointer-events: none;
+        color: inherit;
+    }
+
+    .otp-verification-footer {
+        text-align: center;
+        margin-top: 2.5rem;
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+
+    .otp-verification-footer a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .otp-verification-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.75rem;
+        font-size: 0.95rem;
+    }
+
+    .alert-success {
+        background-color: rgba(46, 204, 113, 0.1);
+        border: 1px solid #2ecc71;
+        color: #27ae60;
+    }
+
+    .alert-danger {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid #e74c3c;
+        color: #c0392b;
+    }
+
+    @media (max-width: 576px) {
+        .otp-verification-container {
+            padding: 2rem 1.5rem;
+            margin: 2rem 1rem;
+            border-radius: 10px;
+        }
+        
+        .otp-verification-title {
+            font-size: 1.75rem;
+        }
+
+        .otp-input {
+            width: 46px;
+            height: 56px;
+            font-size: 1.4rem;
+        }
+    }
+</style>
+
+<div class="otp-verification-container">
+    <div class="otp-verification-header">
+        <h1 class="otp-verification-title">Verify OTP</h1>
+        <p class="otp-verification-subtitle">We've sent a 6-digit code to your email</p>
+        <div class="email-display">******@{{ email|slice:":3" }}****.{{ email|slice:"-3:" }}</div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" class="otp-verification-form" action="{% url 'reset_pass' %}">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="otp" class="form-label">Enter 6-digit OTP</label>
+            <div class="otp-input-container">
+                <input type="text" class="otp-input" name="otp1" maxlength="1" pattern="\d" inputmode="numeric" autocomplete="one-time-code" required autofocus>
+                <input type="text" class="otp-input" name="otp2" maxlength="1" pattern="\d" inputmode="numeric" required>
+                <input type="text" class="otp-input" name="otp3" maxlength="1" pattern="\d" inputmode="numeric" required>
+                <input type="text" class="otp-input" name="otp4" maxlength="1" pattern="\d" inputmode="numeric" required>
+                <input type="text" class="otp-input" name="otp5" maxlength="1" pattern="\d" inputmode="numeric" required>
+                <input type="text" class="otp-input" name="otp6" maxlength="1" pattern="\d" inputmode="numeric" required>
+            </div>
+            <input type="hidden" name="full_otp" id="full_otp">
+        </div>
+
+        <div class="timer" id="timer">
+            OTP expires in: <span id="countdown">03:00</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Verify OTP</button>
+        
+        <div class="resend-link {% if not can_resend %}disabled{% endif %}" id="resend-container">
+            Didn't receive code? <a id="resend-otp" {% if can_resend %}href="{% url 'forgot_pass' %}"{% endif %}>Resend OTP</a>
+        </div>
+    </form>
+
+    <div class="otp-verification-footer">
+        <a href="{% url 'user_login' %}">Back to Sign In</a>
+    </div>
+</div>
+
+<script>
+    // Auto-focus and auto-tab between OTP inputs
+    const otpInputs = document.querySelectorAll('.otp-input');
+    
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            if (e.target.value.length === 1) {
+                if (index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            }
+        });
+        
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+    });
+    
+    // Combine OTP digits into one hidden field before submission
+    const form = document.querySelector('.otp-verification-form');
+    form.addEventListener('submit', (e) => {
+        let fullOtp = '';
+        otpInputs.forEach(input => {
+            fullOtp += input.value;
+        });
+        document.getElementById('full_otp').value = fullOtp;
+    });
+    
+    // Countdown timer for OTP expiration
+    let timeLeft = 180; // 3 minutes in seconds
+    const countdownElement = document.getElementById('countdown');
+    const resendContainer = document.getElementById('resend-container');
+    
+    const timer = setInterval(() => {
+        timeLeft--;
+        
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        
+        countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            countdownElement.textContent = "Expired";
+            resendContainer.classList.remove('disabled');
+            document.getElementById('resend-otp').href = "{% url 'forgot_pass' %}";
+        }
+    }, 1000);
+</script>
+{% endblock %}
+
+{% block features %} {% endblock %}
+{% block working %} {% endblock %}
+{% block cta %} {% endblock %}
